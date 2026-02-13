@@ -20,7 +20,7 @@ ci:
       - any-glob-to-any-file: .github/**
 repo:
   - changed-files:
-      - any-glob-to-any-file: codecov.yaml
+      - any-glob-to-any-file: .codecov.yaml
       - any-glob-to-any-file: .golangci-lint.yml
       - any-glob-to-any-file: .goreleaser.yaml
       - any-glob-to-any-file: .markdownlint.yaml
@@ -28,6 +28,19 @@ repo:
 docker:
   - changed-files:
       - any-glob-to-any-file: Dockerfile
+
+security:
+  - changed-files:
+      - any-glob-to-any-file: ".github/workflows/security.yml"
+      - any-glob-to-any-file: ".goreleaser.yml"
+  - head-branch: ["^security", "security"]
+
+code-quality:
+  - head-branch: ["^refactor", "refactor", "^cleanup", "cleanup"]
+
+chore:
+  - head-branch: ["^chore", "chore"]
+
 # Add 'feature' label to any PR where the head branch name starts with `feature` or has a `feature` section in the name
 feature:
   - head-branch: ["^feature", "feature"]

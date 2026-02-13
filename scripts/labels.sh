@@ -44,6 +44,17 @@ declare -A LABEL_COLORS=(
   ["minor"]="0E8A16"        # Green - feature
   ["patch"]="FEF2C0"        # Yellow - fix
   ["dont-release"]="D4C5F9" # Lavender - skip
+
+  # Severity labels
+  ["severity: critical"]="B60205" # Dark red - critical
+  ["severity: high"]="D93F0B"     # Red-orange - high
+  ["severity: medium"]="FBCA04"   # Yellow - medium
+  ["severity: low"]="0E8A16"      # Green - low
+
+  # Category labels
+  ["chore"]="C2E0C6"        # Light green - maintenance
+  ["security"]="D73A4A"     # Red - security
+  ["code-quality"]="BFD4F2" # Light blue - code quality
 )
 
 declare -A LABEL_DESCRIPTIONS=(
@@ -62,6 +73,17 @@ declare -A LABEL_DESCRIPTIONS=(
   ["minor"]="New features - increment minor version (0.x.0)"
   ["patch"]="Bug fixes - increment patch version (0.0.x)"
   ["dont-release"]="No release needed for this PR"
+
+  # Severity labels
+  ["severity: critical"]="Urgent issue requiring immediate attention"
+  ["severity: high"]="Important issue to address soon"
+  ["severity: medium"]="Moderate issue to address in normal workflow"
+  ["severity: low"]="Minor issue or improvement"
+
+  # Category labels
+  ["chore"]="Maintenance, refactoring, or tooling changes"
+  ["security"]="Security-related issue or fix"
+  ["code-quality"]="Code quality improvement or technical debt"
 )
 
 # Script directory and repo root
@@ -161,7 +183,7 @@ label_exists() {
   local label="$1"
   local existing_labels="$2"
 
-  echo "$existing_labels" | grep -q "^${label}$"
+  echo "$existing_labels" | grep -qxF "$label"
 }
 
 create_label() {
@@ -255,9 +277,16 @@ main() {
   pr_labels=$(extract_labels_from_pr_workflow "$PR_LABELS_FILE")
   log_info "Found $(echo "$pr_labels" | wc -l | tr -d ' ') labels in pr-labels.yml"
 
+  # Severity labels are manual-only (not auto-applied by labeler)
+  local severity_labels="severity: critical
+severity: high
+severity: medium
+severity: low"
+  log_info "Found 4 severity labels defined in script"
+
   # Combine and deduplicate
   local all_labels
-  all_labels=$(echo -e "${labeler_labels}\n${pr_labels}" | sort -u)
+  all_labels=$(echo -e "${labeler_labels}\n${pr_labels}\n${severity_labels}" | sort -u)
   local total_labels
   total_labels=$(echo "$all_labels" | wc -l | tr -d ' ')
 
